@@ -1,22 +1,22 @@
 #include "opencv2/imgproc.hpp"
-#include "opencv2/imgcodecs.hpp"
-#include "opencv2/videoio.hpp"
+//#include "opencv2/videoio.hpp"
+//#include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui.hpp"
-#include <iostream>
-#include <vector>
-#include <sstream>
+#include <algorithm>
 #include <fstream>
 #include <iomanip>
-#include <algorithm>
-
+#include <iostream>
+#include <sstream>
+#include <vector>
 using namespace cv;
 using namespace std;
 
-stringstream data;
+stringstream dataSs;
 string dataStr;
 
 void clear(vector<int> &v)
 {
+    cout << "clearing" << endl;
     auto end = v.end();
     for (auto it = v.begin(); it != end; ++it)
     {
@@ -29,6 +29,7 @@ int c;
 vector<int> colorsTxt;
 void loadFile(string file)
 {
+    cout<< "Loading file..." << endl;
     string line;
     ifstream inFile(file.c_str(), ios::in);
     if (inFile)
@@ -50,18 +51,18 @@ void loadFile(string file)
 
 void save(vector<int> newColors, string file)
 {
+    cout << "saving" << endl;
     for (int i = 0; i < newColors.size(); i++)
     {
         colorsTxt.push_back(newColors[i]);
     }
-
     clear(colorsTxt);
 
     for (int i = 0; i < colorsTxt.size(); i++)
     {
-        data << colorsTxt[i] << endl;
+        dataSs << colorsTxt[i] << endl;
     }
-    dataStr = data.str();
+    dataStr = dataSs.str();
 
     ofstream outFile(file.c_str(), ios::out);
     if (outFile)
@@ -75,7 +76,7 @@ void save(vector<int> newColors, string file)
 
 Mat image0, image;
 int ffillMode = 1;
-int loDiff = 44, upDiff = 37;
+int loDiff = 0, upDiff = 0;
 int connectivity = 4;
 int isColor = true;
 bool useMask = false;
@@ -84,9 +85,9 @@ int mode;
 #define FIELD 0
 #define OPPONENT 1
 
-static void onMouse(int event, int x, int y, int, void *)
+static void onMouse(int event, int x, int y, int d, void *ptr)
 {
-    if (event != EVENT_LBUTTONDOWN)
+    if (event != CV_EVENT_LBUTTONDOWN)
         return;
     Point seed = Point(x, y);
     int lo = ffillMode == 0 ? 0 : loDiff;
@@ -100,13 +101,11 @@ static void onMouse(int event, int x, int y, int, void *)
     r = 0;   //(unsigned)theRNG() & 255;
 
     int area;
-
     Rect ccomp;
     Scalar newVal = Scalar(b, g, r);
     Mat clusterized = image;
     Mat frame;
     image.copyTo(frame);
-    
 
     area = floodFill(clusterized, seed, newVal, &ccomp, Scalar(lo, lo, lo),
                      Scalar(up, up, up), flags);
@@ -143,9 +142,13 @@ static void onMouse(int event, int x, int y, int, void *)
     clear(colours);
     loadFile("clustering.txt");
     save(colours, "clustering.txt");    
+    
 }
 
 int main(int argc, char **argv)
+/*  fixed: a image estava sendo declarada tanto como variavel global quanto local; 
+ *  Outro problema é que a leitura da imagem (por parametro estava sendo feita na "image", não na "image0");
+ */
 {
     if (argc != 2)
     {
@@ -153,12 +156,12 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    Mat image;
-    image = imread(argv[1], CV_LOAD_IMAGE_COLOR); // Read the file
+    image0;
+    image0 = imread(argv[1], CV_LOAD_IMAGE_COLOR); // Read the file
 
-    if (!image.data) // Check for invalid input
+    if (!image0.data) // Check for invalid input
     {
-        cout << "Could not open or find the image" << std::endl;
+        cout << "Could not open or find the image0" << std::endl;
         return -1;
     }
 
@@ -166,10 +169,13 @@ int main(int argc, char **argv)
     namedWindow("image", 0);
     //createTrackbar("lo_diff", "image", &loDiff, 255, 0);
     //createTrackbar("up_diff", "image", &upDiff, 255, 0);
+    cout << "vai \n";
     setMouseCallback("image", onMouse, 0);
     for (;;)
     {
+        cout<< "foi1 ";
         imshow("image", image);
+        cout << "foiOto"<< endl;
         char c = (char)waitKey(0);
         if (c == 27)
         {
@@ -203,6 +209,7 @@ int main(int argc, char **argv)
             connectivity = 8;
             break;
         }
+        cout<< "foi o Ultimo" << endl;
     }
     return 0;
 }
