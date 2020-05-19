@@ -14,8 +14,5 @@ target_link_libraries( clustering ${OpenCV_LIBS} ${PathTohighguiSo}) # link Open
 add_executable(test test.cpp)
 target_link_libraries( test ${OpenCV_LIBS} )
 
-add_executable( original original2dot4.cpp )
-target_link_libraries( original ${OpenCV_LIBS} )
-
 MESSAGE("OpenCV_LIBS: " ${OpenCV_LIBS} )  #display opencv libs found
 
