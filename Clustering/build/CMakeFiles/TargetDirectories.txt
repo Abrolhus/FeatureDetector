@@ -1,4 +1,0 @@
-/home/user/Development/rinobot/codigos/projetos/FeatureDetector/Clustering/build/CMakeFiles/rebuild_cache.dir
-/home/user/Development/rinobot/codigos/projetos/FeatureDetector/Clustering/build/CMakeFiles/edit_cache.dir
-/home/user/Development/rinobot/codigos/projetos/FeatureDetector/Clustering/build/CMakeFiles/clustering.dir
-/home/user/Development/rinobot/codigos/projetos/FeatureDetector/Clustering/build/CMakeFiles/test.dir
