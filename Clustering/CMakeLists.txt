@@ -11,6 +11,9 @@ add_executable(clustering main.cpp)
 # target_link_libraries( clustering ${OpenCV_LIBS} /usr/local/lib/libopencv_highgui.so) # link OpenCV libraries , hightgui.so not found by cmake so this hack
 target_link_libraries( clustering ${OpenCV_LIBS} ${PathTohighguiSo}) # link OpenCV libraries , hightgui.so not found by cmake so this hack
 
+add_executable(klustering bloatMain.cpp)
+target_link_libraries( klustering ${OpenCV_LIBS} ${PathTohighguiSo}) # link OpenCV libraries , hightgui.so not found by cmake so this hack
+
 add_executable(test test.cpp)
 target_link_libraries( test ${OpenCV_LIBS} )
 
