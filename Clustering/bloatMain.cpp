@@ -18,7 +18,7 @@ string dataStr;
 void printSet(set<int> set){
     for (auto it = set.begin(); it != set.end(); ++it)
     {
-        cout << *it;
+        cout << *it << " ";
     }
     cout << endl;
 }    
@@ -46,18 +46,17 @@ void loadFile(string file, set<int> set)
         cout << "could not open file, creating a new one..." << endl;
 }
 
-void addToSet(vector<int> vec, set<int> set){
+void addToSet(vector<int> vec, set<int>* set){
     cout << "before adding to set: ";
-    printSet(set);
+    printSet(*set);
     cout << "adding to set..." << endl;
     for (int i = 0; i <vec.size(); i++)
     {
-        set.insert(vec[i]);
+        set->insert(vec[i]);
     }
     // clear(colorsTxt); Não precisa porque agora está sendo usado SETS ao inves de VECTORS,
 	// que por natureza impedem a duplicidade de elementos (como um um conjunto na matemática)
-    printSet(set);
-    printSet(set);
+    printSet(*set);
 
 }
 
@@ -152,7 +151,7 @@ static void onMouse(int event, int x, int y, int d, void *st)
     cout << "colours0: " << colours[0] << endl;
     // loadFile("clustering.txt", colors);
     // save(colours, "clustering.txt");    
-    addToSet(colours, *setPoints);    
+    addToSet(colours, setPoints);    
     
 }
 
