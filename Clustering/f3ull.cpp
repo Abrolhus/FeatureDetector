@@ -31,6 +31,7 @@ set<int> colorsTxt;
 int main(int argc, char **argv)
 {
     void onMouse(int event, int x, int y, int d, void*);
+    void clustering(Mat* img, set<int> set);
     void printSet(set<int> set);
     void loadFile(string file, set<int> set);
     void addToSet(vector<int> vec, set<int>* set);
@@ -40,7 +41,8 @@ int main(int argc, char **argv)
 
     set<int> colorsTxt;
     // Mat image;
-    VideoCapture* cap = new VideoCapture("daviSabbagRitual.webm");
+    // VideoCapture* cap = new VideoCapture("daviSabbagRitual.webm");
+    VideoCapture* cap = new VideoCapture("/home/abrolhus/Rinobot/data/jerseys/rinobot/lac2019/video.avi");
     // cap->open("daviSabbagRitual.webm"); // open video
     if(!cap->isOpened())  // check if we succeeded
         return -1;
@@ -118,7 +120,31 @@ void save(set<int> set, string file)
     else
         cout << "could not save file" << endl;
 }
+void clustering(Mat* img, set<int> set)
+{
+    int R, G, B;
+    int col;
+    int step = 2;
+    for (int y = 0; y < img->rows; y+= step)
+    {
+        for (int x = 0; x < img->cols; x+= step)
+        {
+            Vec3b color = img->at<Vec3b>(y, x);
+            B = (int)color.val[0];
+            G = (int)color.val[1];
+            R = (int)color.val[2];
+            col = (B << 16) | (G << 8) | R;
 
+            if (set.find(col) != set.end())
+            {
+                color.val[0] = 0;
+                color.val[1] = 255;
+                color.val[2] = 0;
+            }
+            img->at<Vec3b>(y, x) = color;
+        }
+    }
+}
 void mainLoop (string window,  set<int> *set, VideoCapture* cap){
 
         Mat frame;
@@ -127,6 +153,7 @@ void mainLoop (string window,  set<int> *set, VideoCapture* cap){
         // cvtColor(frame, image, CV_BGR2GRAY);
         // GaussianBlur(edges, edges, Size(7,7), 1.5, 1.5);
         // Canny(edges, edges, 0, 30, 3);
+        clustering(&image, colorsTxt);
         imshow("frame",image);
         // if(waitKey(30) >= 0) break;
         char c = (char)waitKey(30);
@@ -236,3 +263,4 @@ void onMouse(int event, int x, int y, int , void*)
     // save(colours, "clustering.txt");    
     addToSet(colours, &colorsTxt);    
 }
+
