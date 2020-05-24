@@ -17,5 +17,14 @@ target_link_libraries( klustering ${OpenCV_LIBS} ${PathTohighguiSo}) # link Open
 add_executable(test test.cpp)
 target_link_libraries( test ${OpenCV_LIBS} )
 
+add_executable(video videoPlayTest.cpp)
+target_link_libraries( video ${OpenCV_LIBS} ${PathTohighguiSo}) # link OpenCV libraries , hightgui.so not found by cmake so this hack
+
+add_executable(ffull f3ull.cpp)
+target_link_libraries( ffull ${OpenCV_LIBS} ${PathTohighguiSo}) # link OpenCV libraries , hightgui.so not found by cmake so this hack
+
+# add_executable(full full.cpp)
+# target_link_libraries( full ${OpenCV_LIBS} ${PathTohighguiSo}) # link OpenCV libraries , hightgui.so not found by cmake so this hack
+
 MESSAGE("OpenCV_LIBS: " ${OpenCV_LIBS} )  #display opencv libs found
 

@@ -181,7 +181,7 @@ int main(int argc, char **argv)
     //createTrackbar("lo_diff", "image", &loDiff, 255, 0);
     //createTrackbar("up_diff", "image", &upDiff, 255, 0);
     cout << "vai \n";
-        setMouseCallback("image", onMouse, &colorsTxt);
+    setMouseCallback("image", onMouse, &colorsTxt);
     for (;;)
     {
         cout<< "foi1 ";
