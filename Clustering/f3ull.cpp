@@ -9,14 +9,14 @@
 #include <vector>
 #include <set>
 
-#define LODIFF 10
-#define UPDIFF 10
+#define LODIFF 40
+#define UPDIFF 40
 #define CONNECTIVITY 4 
 #define ISCOLOR true
 #define USEMASK false
 #define NEWMASKVAL 255
 #define FFILLMODE 1
-#define MASK_COLOR 0, 255, 0
+#define MASK_COLOR 255, 0, 0
 
 #define FIELD 0
 #define OPPONENT 1
@@ -37,9 +37,10 @@ int main(int argc, char **argv)
     void loadFile(string file, set<int> set);
     void addToSet(vector<int> vec, set<int>* set);
     void save(set<int> set, string file);
-    void mainLoop (string window,  set<int> *set, VideoCapture* cap);
+    void mainLoop (string window,  set<int> *set, VideoCapture* cap, bool* playVideo);
     // static void onMouse(int event, int x, int y, int d, void *st);
 
+    bool playVideo = true;
     set<int> colorsTxt;
     // Mat image;
     // VideoCapture* cap = new VideoCapture("daviSabbagRitual.webm");
@@ -50,8 +51,9 @@ int main(int argc, char **argv)
     // Mat edges;
     namedWindow("frame",0);
     setMouseCallback("frame", onMouse);
+        
     for (;;){
-        mainLoop("frame", &colorsTxt, cap);
+        mainLoop("frame", &colorsTxt, cap, &playVideo);
     }
     return 0;
 }
@@ -91,7 +93,7 @@ void loadFile(string file, set<int> set)
 
 void addToSet(vector<int> vec, set<int>* set){
     cout << "before adding to set: ";
-    printSet(*set);
+    // printSet(*set);
     cout << "adding to set..." << endl;
     for (int i = 0; i <vec.size(); i++)
     {
@@ -125,7 +127,7 @@ void clustering(Mat* img, set<int> set)
 {
     int R, G, B;
     int col;
-    int step = 2; // increment value for x and y. Higher the numeber faster the code.
+    int step = 1; // increment value for x and y. Higher the numeber faster the code.
     for (int y = 0; y < img->rows; y+= step)
     {
         for (int x = 0; x < img->cols; x+= step)
@@ -142,17 +144,20 @@ void clustering(Mat* img, set<int> set)
                 // color.val[1] = 255;
                 // color.val[2] = 0;
                 color = Vec3b(MASK_COLOR);
+                img->at<Vec3b>(y, x) = color;
             }
-            img->at<Vec3b>(y, x) = color;
         }
     }
 
 }
-void mainLoop (string window,  set<int> *set, VideoCapture* cap){
+void mainLoop (string window,  set<int> *set, VideoCapture* cap, bool* playVideo){
 
         Mat frame;
-        *cap >> frame; // get a new frame from camera
-        frame.copyTo(image);
+        if(*playVideo)   
+            *cap >> frame; // get a new frame from camera
+        if(frame.empty() && image.empty()) return; 
+        else if(!frame.empty())
+            frame.copyTo(image);
         // cvtColor(frame, image, CV_BGR2GRAY);
         // GaussianBlur(edges, edges, Size(7,7), 1.5, 1.5);
         // Canny(edges, edges, 0, 30, 3);
@@ -195,9 +200,11 @@ void mainLoop (string window,  set<int> *set, VideoCapture* cap){
             cout << "saving to file..." << endl;
             save(*set, "clustering.txt");
             break;
-        case 'p':
+        case 'n':
             cout << "printing set..." << endl;
             printSet(*set);
+        case 'p':
+            *playVideo = !(*playVideo); 
         }
         cout<< ". ";
 }
@@ -235,14 +242,17 @@ void onMouse(int event, int x, int y, int , void*)
     int R, G, B;
     int color;
     vector<int> colours;
+    unsigned char aux[] = {MASK_COLOR};
+    // cout << "aaaaaaaaaaaaaaaa" << aux[0];
     for (int y = 0; y < clusterized.rows; y++)
     {
         for (int x = 0; x < clusterized.cols; x++)
         {
 
             Vec3b colour = clusterized.at<Vec3b>(y, x);
-            // if (colour.val[0] == 0 && colour.val[1] == 255 && colour.val[2] == 0)
-            if (colour == Vec3b(MASK_COLOR));
+            // if (colour.val[0] == 255 && colour.val[1] == 0 && colour.val[2] == 0)
+            if (colour.val[0] == aux[0] && colour.val[1] ==  aux[1] && colour.val[2] == aux[2] )
+            // if (colour == aux);
             {
                 Vec3b colour = quadro.at<Vec3b>(y, x);
                 B = (int)colour.val[0];
@@ -250,7 +260,7 @@ void onMouse(int event, int x, int y, int , void*)
                 R = (int)colour.val[2];
                 //cout << "B: " << B << " G: " << G << " R: " << R << endl;
                 color = (B << 16) | (G << 8) | R;
-
+                cout << color << " ";
                 //cout << color << endl;
                 colours.push_back(color);
 
