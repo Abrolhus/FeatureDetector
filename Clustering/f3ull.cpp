@@ -9,13 +9,14 @@
 #include <vector>
 #include <set>
 
-#define LODIFF 40
-#define UPDIFF 40
+#define LODIFF 10
+#define UPDIFF 10
 #define CONNECTIVITY 4 
 #define ISCOLOR true
 #define USEMASK false
 #define NEWMASKVAL 255
 #define FFILLMODE 1
+#define MASK_COLOR 0, 255, 0
 
 #define FIELD 0
 #define OPPONENT 1
@@ -124,7 +125,7 @@ void clustering(Mat* img, set<int> set)
 {
     int R, G, B;
     int col;
-    int step = 2;
+    int step = 2; // increment value for x and y. Higher the numeber faster the code.
     for (int y = 0; y < img->rows; y+= step)
     {
         for (int x = 0; x < img->cols; x+= step)
@@ -137,13 +138,15 @@ void clustering(Mat* img, set<int> set)
 
             if (set.find(col) != set.end())
             {
-                color.val[0] = 0;
-                color.val[1] = 255;
-                color.val[2] = 0;
+                // color.val[0] = 0;
+                // color.val[1] = 255;
+                // color.val[2] = 0;
+                color = Vec3b(MASK_COLOR);
             }
             img->at<Vec3b>(y, x) = color;
         }
     }
+
 }
 void mainLoop (string window,  set<int> *set, VideoCapture* cap){
 
@@ -219,7 +222,7 @@ void onMouse(int event, int x, int y, int , void*)
 
     int area;
     Rect ccomp;
-    Scalar newVal = Scalar(b, g, r);
+    Scalar newVal = Scalar(MASK_COLOR);
     Mat clusterized;
     Mat quadro;
     image.copyTo(quadro);
@@ -238,7 +241,8 @@ void onMouse(int event, int x, int y, int , void*)
         {
 
             Vec3b colour = clusterized.at<Vec3b>(y, x);
-            if (colour.val[0] == 0 && colour.val[1] == 255 && colour.val[2] == 0)
+            // if (colour.val[0] == 0 && colour.val[1] == 255 && colour.val[2] == 0)
+            if (colour == Vec3b(MASK_COLOR));
             {
                 Vec3b colour = quadro.at<Vec3b>(y, x);
                 B = (int)colour.val[0];
