@@ -24,10 +24,8 @@
 using namespace cv;
 using namespace std;
 
-stringstream dataSs;
-string dataStr;
 Mat image;
-set<int> colorsTxt;
+// set<int> colorsTxt;
 
 int main(int argc, char **argv)
 {
@@ -37,11 +35,12 @@ int main(int argc, char **argv)
     void loadFile(string file, set<int> set);
     void addToSet(vector<int> vec, set<int>* set);
     void save(set<int> set, string file);
-    void mainLoop (string window,  set<int> *set, VideoCapture* cap, bool* playVideo);
+    int mainLoop (string window,  set<int> *set, VideoCapture* cap, bool* playVideo);
     // static void onMouse(int event, int x, int y, int d, void *st);
 
     bool playVideo = true;
     set<int> colorsTxt;
+    int flag;
     // Mat image;
     // VideoCapture* cap = new VideoCapture("daviSabbagRitual.webm");
     VideoCapture* cap = new VideoCapture("/home/abrolhus/Rinobot/data/jerseys/rinobot/lac2019/video.avi");
@@ -50,17 +49,19 @@ int main(int argc, char **argv)
         return -1;
     // Mat edges;
     namedWindow("frame",0);
-    setMouseCallback("frame", onMouse);
+    setMouseCallback("frame", onMouse, &colorsTxt);
         
     for (;;){
-        mainLoop("frame", &colorsTxt, cap, &playVideo);
+        flag = mainLoop("frame", &colorsTxt, cap, &playVideo);
+        if(flag == -1) return -1;
     }
     return 0;
 }
 
 
 
-void printSet(set<int> set){
+void printSet(set<int> set){ //prints set
+    cout << "P ";
     for (auto it = set.begin(); it != set.end(); ++it)
     {
         cout << *it << " ";
@@ -91,7 +92,7 @@ void loadFile(string file, set<int> set)
         cout << "could not open file, creating a new one..." << endl;
 }
 
-void addToSet(vector<int> vec, set<int>* set){
+void addToSet(vector<int> vec, set<int>* set){ // Adds vector elements to set;
     cout << "before adding to set: ";
     // printSet(*set);
     cout << "adding to set..." << endl;
@@ -102,17 +103,21 @@ void addToSet(vector<int> vec, set<int>* set){
     // clear(p_colorsTxt); Não precisa porque agora está sendo usado SETS ao inves de VECTORS,
 	// que por natureza impedem a duplicidade de elementos (como um um conjunto na matemática)
     printSet(*set);
-
+    cout << "done addin";
 }
 
 void save(set<int> set, string file)
 {
+    printSet(set);
+    stringstream dataSs;
+    string dataStr;
     cout << "saving" << endl;
     for (auto it =set.begin(); it !=set.end(); ++it)
     {
         dataSs << *it << endl;
     }
     dataStr = dataSs.str();
+    cout << "data___________: " << dataStr << endl;
 
     ofstream outFile(file.c_str(), ios::out);
     if (outFile)
@@ -150,25 +155,25 @@ void clustering(Mat* img, set<int> set)
     }
 
 }
-void mainLoop (string window,  set<int> *set, VideoCapture* cap, bool* playVideo){
+int mainLoop (string window,  set<int> *set, VideoCapture* cap, bool* playVideo){
 
         Mat frame;
         if(*playVideo)   
             *cap >> frame; // get a new frame from camera
-        if(frame.empty() && image.empty()) return; 
+        if(frame.empty() && image.empty()) return 0; 
         else if(!frame.empty())
             frame.copyTo(image);
         // cvtColor(frame, image, CV_BGR2GRAY);
         // GaussianBlur(edges, edges, Size(7,7), 1.5, 1.5);
         // Canny(edges, edges, 0, 30, 3);
-        clustering(&image, colorsTxt);
+        clustering(&image, *set);
         imshow("frame",image);
         // if(waitKey(30) >= 0) break;
         char c = (char)waitKey(30);
         if (c == 27)
         {
             cout << "Exiting ...\n";
-            return;
+            return -1;
         }
         switch (c)
         {
@@ -197,22 +202,26 @@ void mainLoop (string window,  set<int> *set, VideoCapture* cap, bool* playVideo
             // connectivity = 8;
             // break;
         case 'w':
+        case 's':
             cout << "saving to file..." << endl;
             save(*set, "clustering.txt");
             break;
         case 'n':
             cout << "printing set..." << endl;
             printSet(*set);
+            break;
         case 'p':
+        case ' ':
             *playVideo = !(*playVideo); 
         }
         cout<< ". ";
+        return 0;
 }
-void onMouse(int event, int x, int y, int , void*)
+void onMouse(int event, int x, int y, int , void* st)
 {
     // Mat imageCopy; image.copyTo
     cout << "foii ";
-    // set<int>* setPoints = (set<int>*) st;
+    set<int>* setPoints = (set<int>*) st;
     if (event != CV_EVENT_LBUTTONDOWN)
         return;
     cout << "rrr";
@@ -271,10 +280,6 @@ void onMouse(int event, int x, int y, int , void*)
             }
         }
     }
-    // clear(colours);
-    // cout << "colours0: " << colours[0] << endl;
-    // loadFile("clustering.txt", colors);
-    // save(colours, "clustering.txt");    
-    addToSet(colours, &colorsTxt);    
+    addToSet(colours, setPoints);    
 }
 
