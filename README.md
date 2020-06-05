@@ -5,4 +5,4 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 ### TODO:
 - [x] "clusterize" video while running
 - [x] Add trackbars to up and lodiff
-- [x] Add buttons to (?) 
+- [ ] Add buttons to (?) 
