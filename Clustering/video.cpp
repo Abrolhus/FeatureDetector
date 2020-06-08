@@ -30,8 +30,12 @@ typedef struct
     int* upDiff;
     int* loDiff;
     set<int>* colorsSet;
+    set<int>* undoSet;
+    
 } ClusteringParams;
+
 // void callbackButton (int, void*){ cout << "FFFFFOIIIIII"; }
+
 int main(int argc, char **argv)
 {
     string video;
@@ -50,21 +54,23 @@ int main(int argc, char **argv)
             break;
     } 
     if(file.empty()) file  = "clustering.txt";
+     
+    /* function declarations */
     void onMouse(int event, int x, int y, int d, void*);
-    void clustering(Mat* img, set<int> set);
-    void printSet(set<int> set);
-    void loadFile(string file, set<int>* set);
-    void addToSet(vector<int> vec, set<int>* set);
-    void save(set<int> set, string file);
-    int mainLoop (string window,  set<int> *set, VideoCapture* cap, bool* playVideo, string file);
+    void clustering(Mat* img, set<int> st);
+    void printSet(set<int> st);
+    void loadFile(string file, set<int>* st);
+    void addToSet(vector<int> vec, set<int>* st, set<int>* undoSet);
+    void removeSetFromSet(set<int>* bigger, set<int>* smaller);
+    void save(set<int> st, string file);
+    int mainLoop (string window,  set<int> *st, set<int>* undoSet, VideoCapture* cap, bool* playVideo, string file);
     // static void onMouse(int event, int x, int y, int d, void *st);
 
     bool playVideo = true;
-    set<int> colorsTxt;
+    set<int> colorsTxt, undoSet;
     int flag;
     int loDiff = 40, upDiff = 40;
-    cout << "upDiff = " << upDiff << " ";
-    ClusteringParams clusteringParams = {&upDiff, &loDiff, &colorsTxt};
+    ClusteringParams clusteringParams = {&upDiff, &loDiff, &colorsTxt, &undoSet};
     // Mat image;
     // VideoCapture* cap = new VideoCapture("daviSabbagRitual.webm");
     VideoCapture* cap = new VideoCapture(video);
@@ -76,26 +82,26 @@ int main(int argc, char **argv)
     namedWindow("frame",0);
     createTrackbar( "lo_diff", "frame", &loDiff, 255, 0 );
     createTrackbar( "up_diff", "frame", &upDiff, 255, 0 );
-    // createButton(NULL,callbackButton);
+    // createButton("Botao",callbackButton);
     setMouseCallback("frame", onMouse, &clusteringParams);
 
     for (;;){
-        flag = mainLoop("frame", &colorsTxt, cap, &playVideo, file);
+        flag = mainLoop("frame", &colorsTxt, &undoSet, cap, &playVideo, file);
         if(flag == -1) return -1;
     }
     return 0;
 }
 
-void printSet(set<int> set)
-{ //prints set
-    for (auto it = set.begin(); it != set.end(); ++it)
+void printSet(set<int> st)
+{ //prints st
+    for (auto it = st.begin(); it != st.end(); ++it)
     {
         cout << *it << " ";
     }
     cout << endl;
 }    
 
-void loadFile(string file, set<int>* set)
+void loadFile(string file, set<int>* st)
 {
     int c;
     cout<< "Loading file..." << endl;
@@ -109,7 +115,7 @@ void loadFile(string file, set<int>* set)
             istringstream actualColor(line);
             actualColor >> c;
             //cout << c << endl;
-            set->insert(c);
+            st->insert(c);
             actualColor.str("");
         }
         inFile.close();
@@ -118,23 +124,32 @@ void loadFile(string file, set<int>* set)
         cout << "could not open file, creating a new one..." << endl;
 }
 
-void addToSet(vector<int> vec, set<int>* set)
-{ // Adds vector elements to set;
-    cout << "adding to set..." << endl;
+void addToSet(vector<int> vec, set<int>* st, set<int>* undoSet)
+{ // Adds vector elements to st;
+    // Also rests undoSet and adds new elements to the undoSet.
+    cout << "adding to st..." << endl;
+    undoSet->clear();
     for (int i = 0; i <vec.size(); i++)
     {
-        set->insert(vec[i]);
+           st->insert(vec[i]);
+           undoSet->insert(vec[i]);
     }
     // clear(p_colorsTxt); Não precisa porque agora está sendo usado SETS ao inves de VECTORS,
     // que por natureza impedem a duplicidade de elementos (como um um conjunto na matemática)
 }
-
-void save(set<int> set, string file)
+void removeSetFromSet(set<int>* bigger, set<int>* smaller){
+    printSet(*smaller);
+    for (auto it =smaller->begin(); it !=smaller->end(); ++it)
+    {
+        bigger->erase(*it);
+    }
+}
+void save(set<int> st, string file)
 {
     stringstream dataSs;
     string dataStr;
     cout << "saving" << endl;
-    for (auto it =set.begin(); it !=set.end(); ++it)
+    for (auto it =st.begin(); it !=st.end(); ++it)
     {
         dataSs << *it << endl;
     }
@@ -178,7 +193,7 @@ void clustering(Mat* img, set<int> set)
 
 }
 
-int mainLoop (string window,  set<int> *set, VideoCapture* cap, bool* playVideo, string file)
+int mainLoop (string window,  set<int> *st, set<int>* undoSet, VideoCapture* cap, bool* playVideo, string file )
 {
 
     Mat frame;
@@ -190,7 +205,7 @@ int mainLoop (string window,  set<int> *set, VideoCapture* cap, bool* playVideo,
     // cvtColor(frame, image, CV_BGR2GRAY);
     // GaussianBlur(edges, edges, Size(7,7), 1.5, 1.5);
     // Canny(edges, edges, 0, 30, 3);
-    clustering(&image, *set);
+    clustering(&image, *st);
     imshow("frame",image);
     // if(waitKey(30) >= 0) break;
     char c = (char)waitKey(30);
@@ -228,11 +243,15 @@ int mainLoop (string window,  set<int> *set, VideoCapture* cap, bool* playVideo,
         case 'w':
         case 's':
             cout << "saving to file..." << endl;
-            save(*set, file);
+            save(*st, file);
             break;
         case 'n':
-            cout << "printing set..." << endl;
-            printSet(*set);
+            cout << "printing st..." << endl;
+            printSet(*st);
+            break;
+        case 'u':
+            cout << "undoing";
+            removeSetFromSet(st, undoSet);
             break;
         case 'p':
         case ' ':
@@ -250,13 +269,11 @@ void onMouse(int event, int x, int y, int , void* st)
      */
     // Mat imageCopy; image.copyTo
     ClusteringParams* params = (ClusteringParams*) st;
-    cout << *(params->upDiff) << ",,, *  ";
     // set<int>* setPoints = (set<int>*) st;
     if (event != CV_EVENT_LBUTTONDOWN)
         return;
     else if(x> image.size().width || x < 0 || y > image.size().height || y < 0)
         return;
-    cout << "rrr";
     Point seed = Point(x, y);
     int lo = FFILLMODE == 0 ? 0 : *(params->loDiff);
     int up = FFILLMODE == 0 ? 0 : *(params->upDiff);
@@ -284,7 +301,6 @@ void onMouse(int event, int x, int y, int , void* st)
     int color;
     vector<int> colours;
     unsigned char aux[] = {MASK_COLOR};
-    // cout << "aaaaaaaaaaaaaaaa" << aux[0];
     for (int y = 0; y < clusterized.rows; y++)
     {
         for (int x = 0; x < clusterized.cols; x++)
@@ -311,6 +327,6 @@ void onMouse(int event, int x, int y, int , void* st)
             }
         }
     }
-    addToSet(colours, params->colorsSet);    
+    addToSet(colours, params->colorsSet, params->undoSet);    
 }
 
