@@ -7,3 +7,4 @@ Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
 > - [x] "clusterize" video while running 
 >- [x] Add trackbars to up and lodiff
 > - [ ] Add buttons to (?) 
+> - [ ] Add multiple colors
