@@ -5,6 +5,7 @@ Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
 > ### TODO:
 
 > - [x] "clusterize" video while running 
->- [x] Add trackbars to up and lodiff
+> - [x] Add trackbars to up and lodiff
+> - [x] Add undo command 
 > - [ ] Add buttons to (?) 
 > - [ ] Add multiple colors
