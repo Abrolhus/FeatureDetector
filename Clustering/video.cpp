@@ -24,12 +24,13 @@ using namespace cv;
 using namespace std;
 
 Mat image;
-// set<int> colorsTxt;
+// set<int> colorsTxt
 typedef struct 
 {
     int* upDiff;
     int* loDiff;
     set<int>* colorsSet;
+    set<int>* colors2Set;
     set<int>* undoSet;
     
 } ClusteringParams;
@@ -67,10 +68,10 @@ int main(int argc, char **argv)
     // static void onMouse(int event, int x, int y, int d, void *st);
 
     bool playVideo = true;
-    set<int> colorsTxt, undoSet;
+    set<int> colorsTxt, undoSet, colors2Txt;
     int flag;
-    int loDiff = 40, upDiff = 40;
-    ClusteringParams clusteringParams = {&upDiff, &loDiff, &colorsTxt, &undoSet};
+    int loDiff = LODIFF, upDiff = UPDIFF;
+    ClusteringParams clusteringParams = {&upDiff, &loDiff, &colorsTxt, &colors2Txt, &undoSet};
     // Mat image;
     // VideoCapture* cap = new VideoCapture("daviSabbagRitual.webm");
     VideoCapture* cap = new VideoCapture(video);
@@ -79,10 +80,11 @@ int main(int argc, char **argv)
         return -1;
     // Mat edges;
     loadFile(file, &colorsTxt);
+    std::cout << cv::getBuildInformation() << std::endl;
     namedWindow("frame",0);
     createTrackbar( "lo_diff", "frame", &loDiff, 255, 0 );
     createTrackbar( "up_diff", "frame", &upDiff, 255, 0 );
-    // createButton("Botao",callbackButton);
+    // createButton("",callbackButton);
     setMouseCallback("frame", onMouse, &clusteringParams);
 
     for (;;){
