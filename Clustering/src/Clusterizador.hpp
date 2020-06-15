@@ -14,17 +14,28 @@ using namespace cv;
 #define CONNECTIVITY 4
 #define CONNECTIVITY 4
 
+// struct Color{
+    // int b;
+    // int g;
+    // int r;
+    // Color(int pb, int pg, int pr) : b(pb), g(pg), r(pr){
+    // }
+// };
 class Clusterizador {
     public:
-        bool createNewCluster(string name, string color);
+        Clusterizador(int lo, int up);
+        Clusterizador();
+        bool createNewCluster(string name, Color color);
+        bool createNewCluster(string name, int b, int g, int r);
         void printClusters();
-        int addToClusterByImage(Mat image, string cluster, int x, int y);
+        int addToClusterByImage(cv::Mat image, string cluster, int x, int y);
+        int clusterizarImagem(cv::Mat* img, string cluster);
         int getLoDiff();
         int getupDiff();
         void setLoDiff(int val);
         void setUpDiff(int val);
-        static int vec3bToInt(cv::Vec3b vec);
     private:
         map<string, Cluster> clusters;
         int loDiff, upDiff;
+        int vec3bToInt(cv::Vec3b vec);
 }; 

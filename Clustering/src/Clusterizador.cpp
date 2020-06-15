@@ -1,14 +1,30 @@
 #include "Clusterizador.hpp"
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-bool Clusterizador::createNewCluster(string name, string color){
-    this->clusters.insert(std::make_pair(name, Cluster(name, color)));
+Clusterizador::Clusterizador(){
+    this->upDiff = this->loDiff = 40;
+}
+Clusterizador::Clusterizador(int lo, int up) : loDiff(lo), upDiff(up){
+}
+bool Clusterizador::createNewCluster(string name, Color color){
+
+    Cluster auxCluster = Cluster(name, color);
+    std::pair <string, Cluster> par = std::make_pair(name, auxCluster);
+    this->clusters.insert(par);
     return true;
 }
 
+bool Clusterizador::createNewCluster(string name, int b, int g, int r){
+
+    Cluster auxCluster = Cluster(name, b, g, r);
+    std::pair <string, Cluster> par = std::make_pair(name, auxCluster);
+    this->clusters.insert(par);
+    return true;
+}
 void Clusterizador::printClusters(){
     for(auto it = this->clusters.begin(); it != this->clusters.end(); ++it){
-        cout << it->first << ": " << it->second.getColor() << " color, " << it->second.getSize() << " elements." << endl;
+        // cout << it->first << ": " << it->second.getColor() << " color, " << it->second.getSize() << " elements." << endl;
+        cout << it->first << ": " << "sei nn" << " color, " << it->second.getSize() << " elements." << endl;
     }
 }
 
@@ -36,16 +52,37 @@ int Clusterizador::addToClusterByImage(cv::Mat image, string cluster, int x, int
             Scalar(this->upDiff, this->upDiff, this->upDiff),flags);
     for(auto it = mask.begin<uchar>(); it != mask.end<uchar>(); ++it){
         if(*it == 255){
-            aux = vec3bToInt(image.at<Vec3b>(y,x));
+                // aux = this->vec3bToInt(Vec3b() );
+                // aux = this->vec3bToInt(image.at<Vec3b>(20, 20));
+                aux = this->vec3bToInt(image.at<Vec3b>(it.pos().y, it.pos().x));
             
             this->clusters.at(cluster).addElement(aux);
         }     
     }
     return 0;
 }
-
-int vec3bToInt(cv::Vec3b vec){
+int Clusterizador::vec3bToInt(cv::Vec3b vec){
     return ((int)vec.val[0] << 16) | ((int)vec.val[1] << 8) | ((int)vec.val[2]); 
 }
+int Clusterizador::clusterizarImagem(cv::Mat* img, string cluster){
+    /* Interates through image point by point.
+     * If point's color is in the specified cluster,
+     * changes the color of the point to the cluster's color. #TODO
+     */
+    if(this->clusters.find(cluster) == this->clusters.end()) {
+           return -1;
+    }
+    MatIterator_<Vec3b> it, end;
+    for( it = img->begin<Vec3b>(), end = img->end<Vec3b>(); it != end; ++it)
+    { // https://docs.opencv.org/2.4/doc/tutorials/core/how_to_scan_images/how_to_scan_images.html#the-iterator-safe-method
+        if(this->clusters.at(cluster).findElement(this->vec3bToInt(*it))){
+            (*it)[0] = this->clusters.at(cluster).getColor().b;
+            (*it)[1] = this->clusters.at(cluster).getColor().g;
+            (*it)[2] = this->clusters.at(cluster).getColor().r;
+        }
+    }
+    return 0;
+}
+
     
      

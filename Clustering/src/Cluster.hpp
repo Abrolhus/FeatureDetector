@@ -10,20 +10,36 @@
 using namespace std;
 using namespace cv;
 
+struct Color{
+    int b;
+    int g;
+    int r;
+    Color(int pb, int pg, int pr) : b(pb), g(pg), r(pr){
+    }
+    Color(){
+
+        b = 0;
+        g = 0;
+        r = 0;
+    }
+};
 class Cluster {
     public:
-        Cluster(string name, string color);
+        Cluster(string name, Color color);
+        Cluster(string name, int b, int g, int r);
         void printElements();    
+        void printColor();
         int addElement(int val);
         int removeElement(int val);
+        bool findElement(int val);
         string getName();
-        string getColor();
+        Color getColor();
         int getSize();
         void setName(string name);
-        void setColor(string color);
+        void setColor(Color color);
     private:
         string name;
         set<int> elements;
-        string color;
+        Color color;
         bool newElementVerifier(int val);
 };

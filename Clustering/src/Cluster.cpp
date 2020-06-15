@@ -6,24 +6,42 @@ void Cluster::printElements(){
     }
     cout << endl;
 }
+
+void Cluster::printColor(){
+    cout << this->color.b << " " << this->color.g << " " << this->color.r << endl;
+}
+
 int  Cluster::addElement(int val){
     if(this->newElementVerifier(val)){
         return this->elements.insert(val).second;
     }
     return false;
 }
-Cluster::Cluster(string name, string color) : name(name), color(color){
+
+bool Cluster::findElement(int val){
+    return this->elements.find(val) != this->elements.end();
 }
+
+Cluster::Cluster(string name, Color color) : name(name), color(color){
+}
+Cluster::Cluster(string name, int b, int g, int r) : name(name){
+       this->color = Color(b, g, r);
+       cout << b << " " << g << " " << r << endl;
+}
+
 string Cluster::getName(){
     return this->name;
 }
-string Cluster::getColor(){
+Color Cluster::getColor(){
     return this->color;
+}
+int Cluster::getSize(){
+    return this->elements.size();
 }
 void Cluster::setName(string name){
     this->name = name;
 }
-void Cluster::setColor(string color){
+void Cluster::setColor(Color color){
     this->color = color;
 }
 bool Cluster::newElementVerifier(int val){
