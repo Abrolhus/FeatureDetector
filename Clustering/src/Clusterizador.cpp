@@ -54,7 +54,7 @@ int Clusterizador::addToClusterByImage(cv::Mat image, string cluster, int x, int
         if(*it == 255){
                 // aux = this->vec3bToInt(Vec3b() );
                 // aux = this->vec3bToInt(image.at<Vec3b>(20, 20));
-                aux = this->vec3bToInt(image.at<Vec3b>(it.pos().y, it.pos().x));
+                aux = this->vec3bToInt(image.at<Vec3b>(it.pos().y-1, it.pos().x-1));
             
             this->clusters.at(cluster).addElement(aux);
         }     
@@ -83,6 +83,27 @@ int Clusterizador::clusterizarImagem(cv::Mat* img, string cluster){
     }
     return 0;
 }
-
+int Clusterizador::addToClusterViaFile(string file, string cluster){
+     int c;
+    cout<< "Loading file..." << endl;
+    string line;
+    ifstream inFile(file.c_str(), ios::in);
+    if (inFile)
+    {
+        while (getline(inFile, line))
+        {
+            //cout << line << '\n';
+            istringstream actualColor(line);
+            actualColor >> c;
+            //cout << c << endl;
+            this->clusters.at(cluster).addElement(c);
+            actualColor.str("");
+        }
+        inFile.close();
+        return 0;
+    }
+    else
+        cout << "could not open file, creating a new one..." << endl;
     
-     
+    return -1;
+} 

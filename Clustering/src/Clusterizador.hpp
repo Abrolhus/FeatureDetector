@@ -29,6 +29,7 @@ class Clusterizador {
         bool createNewCluster(string name, int b, int g, int r);
         void printClusters();
         int addToClusterByImage(cv::Mat image, string cluster, int x, int y);
+        int addToClusterViaFile(string file, string cluster);
         int clusterizarImagem(cv::Mat* img, string cluster);
         int getLoDiff();
         int getupDiff();
