@@ -10,3 +10,4 @@ Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
 > - [ ] Add buttons to (?) 
 > - [x] Add multiple colors
 > - [x] OOP
+> - [x] Add Help function
