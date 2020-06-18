@@ -7,37 +7,28 @@
 #include <sstream>
 #include <vector>
 #include <set>
-
-#define LODIFF 40
-#define UPDIFF 40
-#define CONNECTIVITY 4 
-#define ISCOLOR true
-#define USEMASK false
-#define NEWMASKVAL 255
-#define FFILLMODE 1
-#define MASK_COLOR 255, 0, 0
-
-#define FIELD 0
-#define OPPONENT 1
+#include "src/Clusterizador.hpp"
 
 using namespace cv;
 using namespace std;
 
-Mat image;
-// set<int> colorsTxt;
 typedef struct 
 {
-    int* upDiff;
-    int* loDiff;
-    set<int>* colorsSet;
-    set<int>* undoSet;
-    
+    Mat* image;
+    Clusterizador* clus;
+    string* p_currentCluster;
 } ClusteringParams;
 
-// void callbackButton (int, void*){ cout << "FFFFFOIIIIII"; }
+typedef struct{
+    string name;
+    int b;
+    int g;
+    int r;
+} ClusterConfigs;
 
 int main(int argc, char **argv)
 {
+    Mat image;
     string video;
     string file;
     switch (argc){
@@ -53,160 +44,68 @@ int main(int argc, char **argv)
             return -2;
             break;
     } 
+
+
     if(file.empty()) file  = "clustering.txt";
      
-    /* function declarations */
-    void onMouse(int event, int x, int y, int d, void*);
-    void clustering(Mat* img, set<int> st);
-    void printSet(set<int> st);
-    void loadFile(string file, set<int>* st);
-    void addToSet(vector<int> vec, set<int>* st, set<int>* undoSet);
-    void removeSetFromSet(set<int>* bigger, set<int>* smaller);
-    void save(set<int> st, string file);
-    int mainLoop (string window,  set<int> *st, set<int>* undoSet, VideoCapture* cap, bool* playVideo, string file);
-    // static void onMouse(int event, int x, int y, int d, void *st);
-
     bool playVideo = true;
-    set<int> colorsTxt, undoSet;
-    int flag;
-    int loDiff = 40, upDiff = 40;
-    ClusteringParams clusteringParams = {&upDiff, &loDiff, &colorsTxt, &undoSet};
-    // Mat image;
-    // VideoCapture* cap = new VideoCapture("daviSabbagRitual.webm");
-    VideoCapture* cap = new VideoCapture(video);
-    // cap->open("daviSabbagRitual.webm"); // open video
-    if(!cap->isOpened())  // check if we succeeded
-        return -1;
-    // Mat edges;
-    loadFile(file, &colorsTxt);
-    namedWindow("frame",0);
-    createTrackbar( "lo_diff", "frame", &loDiff, 255, 0 );
-    createTrackbar( "up_diff", "frame", &upDiff, 255, 0 );
-    // createButton("Botao",callbackButton);
-    setMouseCallback("frame", onMouse, &clusteringParams);
+    int mainLoop (bool* playVideo, VideoCapture* videoCap, Mat* p_image, string window, Clusterizador* clust, string* currentCluster);
+    void help();
+    void onMouse(int event, int x, int y, int, void* params);
+    Clusterizador* Clst = new Clusterizador(40, 40);
+    VideoCapture* VideoCap = new VideoCapture(video);
+    string currentCluster = "campo";
+    ClusteringParams clusParams = {&image, Clst, &currentCluster};
+    vector<ClusterConfigs> clusterVector; // vector contendo nome e cor dos clusters a serem
+                       // adicionados ao clusterizador
+    clusterVector.push_back({"campo", 255, 0, 0});
+    clusterVector.push_back({"jerseys", 0, 255, 255});
 
-    for (;;){
-        flag = mainLoop("frame", &colorsTxt, &undoSet, cap, &playVideo, file);
-        if(flag == -1) return -1;
+    namedWindow("image", 0);
+    for(auto it = clusterVector.begin(); it != clusterVector.end(); ++it){
+        Clst->createNewCluster(it->name, it->b, it->g, it->r);
     }
-    return 0;
+    // Clst->createNewCluster("jerseys", 0, 255, 255);
+    // Clst->addToClusterViaFile("naoehazul.txt", currentCluster);
+    setMouseCallback("image", onMouse, &clusParams);
+    // Clst->addToClusterByImage(image, "Azul", x, y);
+    help();
+    
+    for(int flag = 0; flag != -1;){
+        flag = mainLoop(&playVideo, VideoCap, &image, "image", Clst, &currentCluster); 
+    }
+    Clst->printClusters();
 }
-
-void printSet(set<int> st)
-{ //prints st
-    for (auto it = st.begin(); it != st.end(); ++it)
-    {
-        cout << *it << " ";
-    }
-    cout << endl;
-}    
-
-void loadFile(string file, set<int>* st)
+void onMouse(int event, int x, int y, int, void* params)
 {
-    int c;
-    cout<< "Loading file..." << endl;
-    string line;
-    ifstream inFile(file.c_str(), ios::in);
-    if (inFile)
-    {
-        while (getline(inFile, line))
-        {
-            //cout << line << '\n';
-            istringstream actualColor(line);
-            actualColor >> c;
-            //cout << c << endl;
-            st->insert(c);
-            actualColor.str("");
-        }
-        inFile.close();
-    }
-    else
-        cout << "could not open file, creating a new one..." << endl;
+    ClusteringParams* clusParams = (ClusteringParams*) params;
+    Clusterizador* cls = clusParams->clus;
+    string currentCluster = *(clusParams->p_currentCluster);
+    Mat img; 
+    clusParams->image->copyTo(img);
+    if(!img.data)
+       cout << "NULL IMAGE "; 
+    if (event != CV_EVENT_LBUTTONDOWN)
+        return;
+    else if(x> img.size().width || x < 0 || y > img.size().height || y < 0)
+        return;
+    cls->addToClusterByImage(img, currentCluster, x, y);
 }
 
-void addToSet(vector<int> vec, set<int>* st, set<int>* undoSet)
-{ // Adds vector elements to st;
-    // Also rests undoSet and adds new elements to the undoSet.
-    cout << "adding to st..." << endl;
-    undoSet->clear();
-    for (int i = 0; i <vec.size(); i++)
-    {
-           st->insert(vec[i]);
-           undoSet->insert(vec[i]);
-    }
-    // clear(p_colorsTxt); Não precisa porque agora está sendo usado SETS ao inves de VECTORS,
-    // que por natureza impedem a duplicidade de elementos (como um um conjunto na matemática)
-}
-void removeSetFromSet(set<int>* bigger, set<int>* smaller){
-    printSet(*smaller);
-    for (auto it =smaller->begin(); it !=smaller->end(); ++it)
-    {
-        bigger->erase(*it);
-    }
-}
-void save(set<int> st, string file)
+int mainLoop (bool* playVideo, VideoCapture* videoCap, Mat* p_image, string window, Clusterizador* clust, string* currentCluster)
 {
-    stringstream dataSs;
-    string dataStr;
-    cout << "saving" << endl;
-    for (auto it =st.begin(); it !=st.end(); ++it)
-    {
-        dataSs << *it << endl;
-    }
-    dataStr = dataSs.str();
-
-    ofstream outFile(file.c_str(), ios::out);
-    if (outFile)
-    {
-        outFile << dataStr << endl;
-        outFile.close();
-    }
-    else
-        cout << "could not save file" << endl;
-}
-
-void clustering(Mat* img, set<int> set)
-{
-    int R, G, B;
-    int col;
-    int step = 1; // increment value for x and y. Higher the numeber faster the code.
-    for (int y = 0; y < img->rows; y+= step)
-    {
-        for (int x = 0; x < img->cols; x+= step)
-        {
-            Vec3b color = img->at<Vec3b>(y, x);
-            B = (int)color.val[0];
-            G = (int)color.val[1];
-            R = (int)color.val[2];
-            col = (B << 16) | (G << 8) | R;
-
-            if (set.find(col) != set.end())
-            {
-                // color.val[0] = 0;
-                // color.val[1] = 255;
-                // color.val[2] = 0;
-                color = Vec3b(MASK_COLOR);
-                img->at<Vec3b>(y, x) = color;
-            }
-        }
-    }
-
-}
-
-int mainLoop (string window,  set<int> *st, set<int>* undoSet, VideoCapture* cap, bool* playVideo, string file )
-{
-
     Mat frame;
+    string* p_currentCluster = currentCluster;
     if(*playVideo)   
-        *cap >> frame; // get a new frame from camera
-    if(frame.empty() && image.empty()) return 0; 
+        *videoCap >> frame; // get a new frame from camera
+    if(frame.empty() && p_image->empty()) 
+        return 0; 
     else if(!frame.empty())
-        frame.copyTo(image);
-    // cvtColor(frame, image, CV_BGR2GRAY);
-    // GaussianBlur(edges, edges, Size(7,7), 1.5, 1.5);
-    // Canny(edges, edges, 0, 30, 3);
-    clustering(&image, *st);
-    imshow("frame",image);
+        frame.copyTo(*p_image);
+
+    clust->clusterizarImagem(p_image, "jerseys");
+    clust->clusterizarImagem(p_image, "campo");
+    imshow(window, *p_image);
     // if(waitKey(30) >= 0) break;
     char c = (char)waitKey(30);
     if (c == 27 || c == 'q')
@@ -220,113 +119,50 @@ int mainLoop (string window,  set<int> *st, set<int>* undoSet, VideoCapture* cap
             cout << "Original image is restored\n";
             // image0.copyTo(image);
             break;
-            // case 's':
-            // cout << "Simple floodfill mode is set\n";
-            // ffillMode = 0;
-            // break;
-            // case 'f':
-            // cout << "Fixed Range floodfill mode is set\n";
-            // ffillMode = 1;
-            // break;
-            // case 'g':
-            // cout << "Gradient (floating range) floodfill mode is set\n";
-            // ffillMode = 2;
-            // break;
-            // case '4':
-            // cout << "4-connectivity mode is set\n";
-            // connectivity = 4;
-            // break;
-            // case '8':
-            // cout << "8-connectivity mode is set\n";
-            // connectivity = 8;
-            // break;
-        case 'w':
-        case 's':
-            cout << "saving to file..." << endl;
-            save(*st, file);
+        case 'W':
+        case 'S':
+            cout << "saving " << *p_currentCluster << " to file..." << endl;
+            // save(*st, file);
+            clust->saveClusterToFile("teste.txt", *currentCluster);           
             break;
+        case 's':
+        case 'w':
+            cout << "Saving all Clusters to file..." << endl; 
+            clust->saveAllClustersToFile();
+
         case 'n':
-            cout << "printing st..." << endl;
-            printSet(*st);
+            cout << "printing clusters..." << endl;
+            clust->printClusters();
             break;
         case 'u':
             cout << "undoing";
-            removeSetFromSet(st, undoSet);
+            // removeSetFromSet(st, undoSet);
             break;
+        case '1' ... '9':
+        { /* gambiarra para trocar de cluster de acordo com o numero (1 a 9) digitado; 
+           * Note: the brackets are here to destroy the vector "aux" after this case ends;
+           * https://stackoverflow.com/questions/61708267/jump-bypasses-variable-initialization-in-switch-statement
+           */
+            vector<string> aux = clust->getClusterNames(); 
+            cout << aux.size() << endl;
+            if(c <= '0' + aux.size()){
+                *p_currentCluster = aux.at(c - '0' - 1); //TODO make it less dangerous. I don't think there is case where it can go wrong, but who knows;
+                cout << "switched to " << *p_currentCluster << " cluster " << endl;
+            }
+            break;
+        }
         case 'p':
         case ' ':
             *playVideo = !(*playVideo); 
     }
-    cout<< ". ";
     return 0;
 }
-
-void onMouse(int event, int x, int y, int , void* st)
-{
-    /* The onMouse function recieves some stated params and a void pointer.
-     * The thing about void pointers is that they can point to anything you wanted it to. In this case I want it to point to more than one thing, so I used a struct.
-     * https://answers.opencv.org/question/32888/passing-multiple-parameters-with-the-setmousecallback-function/
-     */
-    // Mat imageCopy; image.copyTo
-    ClusteringParams* params = (ClusteringParams*) st;
-    // set<int>* setPoints = (set<int>*) st;
-    if (event != CV_EVENT_LBUTTONDOWN)
-        return;
-    else if(x> image.size().width || x < 0 || y > image.size().height || y < 0)
-        return;
-    Point seed = Point(x, y);
-    int lo = FFILLMODE == 0 ? 0 : *(params->loDiff);
-    int up = FFILLMODE == 0 ? 0 : *(params->upDiff);
-    int flags = CONNECTIVITY + (NEWMASKVAL << 8) +
-        (FFILLMODE == 1 ? FLOODFILL_FIXED_RANGE : 0);
-    int b,g,r;
-
-    b = 0;   //(unsigned)theRNG() & 255;
-    g = 255; //(unsigned)theRNG() & 255;
-    r = 0;   //(unsigned)theRNG() & 255;
-
-    int area;
-    Rect ccomp;
-    Scalar newVal = Scalar(MASK_COLOR);
-    Mat clusterized;
-    Mat quadro;
-    image.copyTo(quadro);
-    image.copyTo(clusterized);
-
-    area = floodFill(clusterized, seed, newVal, &ccomp, Scalar(lo, lo, lo),
-            Scalar(up, up, up), flags);
-
-
-    int R, G, B;
-    int color;
-    vector<int> colours;
-    unsigned char aux[] = {MASK_COLOR};
-    for (int y = 0; y < clusterized.rows; y++)
-    {
-        for (int x = 0; x < clusterized.cols; x++)
-        {
-
-            Vec3b colour = clusterized.at<Vec3b>(y, x);
-            // if (colour.val[0] == 255 && colour.val[1] == 0 && colour.val[2] == 0)
-            if (colour.val[0] == aux[0] && colour.val[1] ==  aux[1] && colour.val[2] == aux[2] )
-                // if (colour == aux);
-            {
-                Vec3b colour = quadro.at<Vec3b>(y, x);
-                B = (int)colour.val[0];
-                G = (int)colour.val[1];
-                R = (int)colour.val[2];
-                //cout << "B: " << B << " G: " << G << " R: " << R << endl;
-                color = (B << 16) | (G << 8) | R;
-                //cout << color << endl;
-                colours.push_back(color);
-
-                // char r = (cor >> 16) & 0xFF;
-                // char g = (cor >> 8) & 0xFF;
-                // char b = cor & 0xFF;
-                // cout << "b: " << (int)b << " g: " << (int)g << " r: " << (int)r << endl;
-            }
-        }
-    }
-    addToSet(colours, params->colorsSet, params->undoSet);    
-}
-
+void help(){
+    cout << "Usage: ./this video.ext" << endl <<
+            "Click on image to floodfill it;" << endl << 
+            "Keyboard Commands:" << endl <<
+            "\t(u)ndo, (p)ause, (n) Print Clusters," << endl << 
+            "\t(s)ave clusters to file" << endl <<
+            "\t1 - 9: change to cluster x"<< endl << 
+            "\t(q)uit" << endl;
+ }
