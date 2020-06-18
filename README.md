@@ -14,3 +14,5 @@ Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
 > - [ ] Add trackbars to up and lodiff
 > - [ ] Receive cluster names (and quantity) by argument
 > - [ ] Add flag (something like '-c') to "pre-clusterize" the video acording to the values already present in the text files.
+> Possible improvements:
+> * Use ranges instead of raw int values. <CR> The ideia is to istead of a list of int values like {43, 45, 47, 48, 53, 56, ...), use something like {43:56}
