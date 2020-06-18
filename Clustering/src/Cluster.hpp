@@ -37,6 +37,7 @@ class Cluster {
         int getSize();
         void setName(string name);
         void setColor(Color color);
+        set<int> getElements();
     private:
         string name;
         set<int> elements;

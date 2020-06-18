@@ -8,10 +8,12 @@
 #include <sstream>
 #include <vector>
 #include <set>
-using namespace std;
-using namespace cv;
+// using namespace cv;
+// using namespace std; 
+/*note: avoid using "using namespace std in include files, it may break the code 
+ * https://stackoverflow.com/questions/5849457/using-namespace-in-c-headers
+ */
 #define NEWMASKVAL 255
-#define CONNECTIVITY 4
 #define CONNECTIVITY 4
 
 // struct Color{
@@ -25,18 +27,24 @@ class Clusterizador {
     public:
         Clusterizador(int lo, int up);
         Clusterizador();
-        bool createNewCluster(string name, Color color);
-        bool createNewCluster(string name, int b, int g, int r);
+        bool createNewCluster(std::string name, Color color);
+        bool createNewCluster(std::string name, int b, int g, int r);
         void printClusters();
-        int addToClusterByImage(cv::Mat image, string cluster, int x, int y);
-        int addToClusterViaFile(string file, string cluster);
-        int clusterizarImagem(cv::Mat* img, string cluster);
+        int addToClusterByImage(cv::Mat image, std::string cluster, int x, int y);
+        int addToClusterViaFile(std::string file, std::string cluster);
+        int clusterizarImagem(cv::Mat* img, std::string cluster);
+        int saveClusterToFile(std::string file, std::string cluster);
+        int saveAllClustersToFile();
+        int saveAllClustersToFile(string filePrefix);
         int getLoDiff();
         int getupDiff();
+        vector<string> getClusterNames();
         void setLoDiff(int val);
         void setUpDiff(int val);
     private:
-        map<string, Cluster> clusters;
+        map<std::string, Cluster> clusters;
         int loDiff, upDiff;
         int vec3bToInt(cv::Vec3b vec);
+        bool checkIfClusterExists(string cluster);
+
 }; 

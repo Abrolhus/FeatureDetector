@@ -21,6 +21,9 @@ int  Cluster::addElement(int val){
 bool Cluster::findElement(int val){
     return this->elements.find(val) != this->elements.end();
 }
+set<int> Cluster::getElements(){// cheap way to interate through this' elements
+    return this->elements;
+}
 
 Cluster::Cluster(string name, Color color) : name(name), color(color){
 }

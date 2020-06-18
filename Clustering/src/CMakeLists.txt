@@ -7,9 +7,9 @@ include_directories( ${OpenCV_INCLUDE_DIRS} ) # provide library headers
 file(GLOB_RECURSE SOURCES LIST_DIRECTORIES true *.h *.cpp)
 
 set(SOURCES ${SOURCES})
-
-add_executable(${BINARY}_run ${SOURCES})
-target_link_libraries(${BINARY}_run ${OpenCV_LIBS} ${PathTohighguiSo} )
-# add_executable(${BINARY}_run main.cpp)
-
-add_library(${BINARY}_lib STATIC ${SOURCES})
+# 
+# add_executable("../${BINARY}_run" ${SOURCES})
+# target_link_libraries("../${BINARY}_run" ${OpenCV_LIBS} ${PathTohighguiSo} )
+# add_executable("../${BINARY}_run"  main.cpp)
+# 
+add_library(src_lib STATIC ${SOURCES})
