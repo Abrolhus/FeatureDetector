@@ -87,7 +87,7 @@ int main(int argc, char **argv)
         // Clst->addToClusterViaFile(it->name + ".txt", it->name);
     // }
     // Clst->createNewCluster("teste123", RED);
-    // currentCluster = Clst->getClusterNames().empty()? "": Clst->getClusterNames().at(0);
+    currentCluster = Clst->getClusterNames().empty()? "": Clst->getClusterNames().at(0);
     
     //programs starts
     setMouseCallback("image", onMouse, &clusParams);
