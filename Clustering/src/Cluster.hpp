@@ -26,6 +26,7 @@ struct Color{
 class Cluster {
     public:
         Cluster(string name, Color color);
+        // Cluster(string name, string color);
         Cluster(string name, int b, int g, int r);
         void printElements();    
         void printColor();
