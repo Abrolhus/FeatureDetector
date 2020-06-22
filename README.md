@@ -12,7 +12,7 @@ Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
 > - [x] OOP
 > - [x] Add Help function
 > - [ ] Add trackbars to up and lodiff
-> - [ ] Receive cluster names (and quantity) by argument
+> - [x] Receive cluster names (and quantity) by argument
 > - [ ] Add flag (something like '-c') to "pre-clusterize" the video acording to the values already present in the text files.
 > 
 ### Possible improvements:
