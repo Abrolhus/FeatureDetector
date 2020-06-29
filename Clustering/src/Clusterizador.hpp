@@ -50,10 +50,8 @@ class Clusterizador {
         map<std::string, Cluster> clusters;
         int loDiff, upDiff;
         int vec3bToInt(cv::Vec3b vec);
-        bool createNewCluster(std::string name, Color color);
         bool checkIfClusterExists(string cluster);
-        Color convertHexToColor(int hexValue);
-        Color convertHexToColor(string color);
+        int convertHexToInt(string color);
 
 
 }; 

@@ -26,22 +26,30 @@ struct Color{
 class Cluster {
     public:
         Cluster(string name, Color color);
+        int b();
+        int g();
+        int r();
         // Cluster(string name, string color);
         Cluster(string name, int b, int g, int r);
+        Cluster(string name, int hexColor);
         void printElements();    
-        void printColor();
+        std::string getColorString();
         int addElement(int val);
         int removeElement(int val);
         bool findElement(int val);
         string getName();
-        Color getColor();
+        int getColor();
         int getSize();
         void setName(string name);
-        void setColor(Color color);
+        // void setColor(Color color);
+        void setColor(int hexColor);
         set<int> getElements();
     private:
         string name;
         set<int> elements;
-        Color color;
+        // Color color;
+        int color;
         bool newElementVerifier(int val);
+        int bgrToInt(int b, int g, int r);
 };
+

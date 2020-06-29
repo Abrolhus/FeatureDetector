@@ -11,19 +11,10 @@ using namespace std;
 // }
 Clusterizador::Clusterizador(int lo, int up) : loDiff(lo), upDiff(up){
 }
-
-bool Clusterizador::createNewCluster(string name, Color color){
-    if(this->checkIfClusterExists(name))
-        return false;
-    Cluster auxCluster = Cluster(name, color);
-    std::pair <string, Cluster> par = std::make_pair(name, auxCluster);
-    this->clusters.insert(par);
-    return true;
-}
 bool Clusterizador::createNewCluster(string name, string hexColor){
     if(this->checkIfClusterExists(name))
         return false;
-    Color color = this->convertHexToColor(hexColor);
+    int color = this->convertHexToInt(hexColor);
     Cluster auxCluster = Cluster(name, color);
     std::pair <string, Cluster> par = std::make_pair(name, auxCluster);
     this->clusters.insert(par);
@@ -33,8 +24,8 @@ bool Clusterizador::createNewCluster(string name, string hexColor){
 bool Clusterizador::createNewCluster(string name, int hexColor){
     if(this->checkIfClusterExists(name))
         return false;
-    Color color = this->convertHexToColor(hexColor);
-    Cluster auxCluster = Cluster(name, color);
+    // Color color = this->convertHexToColor(hexColor);
+    Cluster auxCluster = Cluster(name, hexColor);
     std::pair <string, Cluster> par = std::make_pair(name, auxCluster);
     this->clusters.insert(par);
     return true;
@@ -52,7 +43,7 @@ bool Clusterizador::createNewCluster(string name, int b, int g, int r){
 void Clusterizador::printClusters(){
     for(auto it = this->clusters.begin(); it != this->clusters.end(); ++it){
         // cout << it->first << ": " << it->second.getColor() << " color, " << it->second.getSize() << " elements." << endl;
-        cout << it->first << ": " << "sei nn" << " color, " << it->second.getSize() << " elements." << endl;
+        cout << it->first << ": " << it->second.getColorString() << " color, " << it->second.getSize() << " elements." << endl;
     }
 }
 
@@ -103,9 +94,9 @@ int Clusterizador::clusterizarImagem(cv::Mat* img, string cluster){
     for( it = img->begin<Vec3b>(), end = img->end<Vec3b>(); it != end; ++it)
     { // https://docs.opencv.org/2.4/doc/tutorials/core/how_to_scan_images/how_to_scan_images.html#the-iterator-safe-method
         if(this->clusters.at(cluster).findElement(this->vec3bToInt(*it))){
-            (*it)[0] = this->clusters.at(cluster).getColor().b;
-            (*it)[1] = this->clusters.at(cluster).getColor().g;
-            (*it)[2] = this->clusters.at(cluster).getColor().r;
+            (*it)[0] = this->clusters.at(cluster).b();
+            (*it)[1] = this->clusters.at(cluster).g();
+            (*it)[2] = this->clusters.at(cluster).r();
         }
     }
     return 0;
@@ -125,9 +116,9 @@ int Clusterizador::clusterizarImagem(cv::Mat* img){
         for(auto clust = this->clusters.begin(); clust != this->clusters.end(); ++clust)
         { // https://docs.opencv.org/2.4/doc/tutorials/core/how_to_scan_images/how_to_scan_images.html#the-iterator-safe-method
             if(clust->second.findElement(this->vec3bToInt(*it))){
-                (*it)[0] = clust->second.getColor().b;
-                (*it)[1] = clust->second.getColor().g;
-                (*it)[2] = clust->second.getColor().r;
+                (*it)[0] = clust->second.b();
+                (*it)[1] = clust->second.g();
+                (*it)[2] = clust->second.r();
             }
         }
     }
@@ -220,18 +211,10 @@ vector<string> Clusterizador::getClusterNames(){
     return aux;
 }
 
-Color Clusterizador::convertHexToColor(int hexValue){
-    Color color;
-    color.r = ((hexValue >> 16) & 0xFF);  // Extract the RR byte
-    color.g = ((hexValue >> 8) & 0xFF);   // Extract the GG byte
-    color.b = ((hexValue) & 0xFF);        // Extract the BB byte
-
-  return color; 
-}
-Color Clusterizador::convertHexToColor(string color){
+int Clusterizador::convertHexToInt(string color){
     // https://stackoverflow.com/questions/1070497/c-convert-hex-string-to-signed-integer
-    cout << stoi(color.c_str(), 0, 16) << " uai" << endl;
-    return convertHexToColor(stoi(color.c_str(), 0, 16));
+    // cout << stoi(color.c_str(), 0, 16) << " uai" << endl;
+    return stoi(color.c_str(), 0, 16);
     // int x;
 // 
     // std::stringstream ss;

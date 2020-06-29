@@ -1,4 +1,5 @@
 #include "Cluster.hpp"
+#include <string>
 void Cluster::printElements(){
     for (auto it = this->elements.begin(); it != this->elements.end(); ++it)
     {
@@ -7,8 +8,8 @@ void Cluster::printElements(){
     cout << endl;
 }
 
-void Cluster::printColor(){
-    cout << this->color.b << " " << this->color.g << " " << this->color.r << endl;
+string Cluster::getColorString(){
+    return "(" + to_string(this->b()) + ", " + to_string(this->g()) + ", " + to_string(this->r()) + ")";
 }
 
 int  Cluster::addElement(int val){
@@ -25,18 +26,26 @@ set<int> Cluster::getElements(){// cheap way to interate through this' elements
     return this->elements;
 }
 
-Cluster::Cluster(string name, Color color) : name(name), color(color){
+Cluster::Cluster(string name, int hexColor) : name(name), color(hexColor){
 }
 Cluster::Cluster(string name, int b, int g, int r) : name(name){
-       this->color = Color(b, g, r);
-       cout << b << " " << g << " " << r << endl;
+           this->color = this->bgrToInt(b,g,r);
 }
 
 string Cluster::getName(){
     return this->name;
 }
-Color Cluster::getColor(){
+int Cluster::getColor(){
     return this->color;
+}
+int Cluster::b(){
+    return ((this->color >> 16) & 0xFF);
+}
+int Cluster::g(){
+    return ((this->color >> 8) & 0xFF);
+}
+int Cluster::r(){
+    return ((this->color) & 0xFF);
 }
 int Cluster::getSize(){
     return this->elements.size();
@@ -44,9 +53,12 @@ int Cluster::getSize(){
 void Cluster::setName(string name){
     this->name = name;
 }
-void Cluster::setColor(Color color){
-    this->color = color;
+void Cluster::setColor(int hexColor){
+    this->color = hexColor;
 }
 bool Cluster::newElementVerifier(int val){
     return true;
+}
+int Cluster::bgrToInt(int b, int g, int r){
+    return  (b << 16) | (g << 8) | (r);
 }
