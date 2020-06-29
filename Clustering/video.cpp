@@ -10,21 +10,20 @@
 #include "src/Clusterizador.hpp"
 
 ///Colors///
-//TODO: Fix this, from RGB to BGR
-#define RED 0xcc0000
-#define PURPLE 0x8000ff
-#define BLUE 0x0000ff
+//FIXED: Fix this, from RGB to BGR
+#define RED 0x0000cc
+#define PURPLE 0xff0080
+#define BLUE 0xff0000
 #define GREEN 0x009900
-#define YELLOW 0xffff00
-#define LBLUE 0x009999
-#define ORANGE 0xff6600
-#define LGREEN 0x99cc00
-#define LILAS 0xcc99ff
-
-
+#define YELLOW 0x00ffff
+#define LBLUE 0x999900
+#define ORANGE 0x0066ff
+#define LGREEN 0x00cc99
+#define LILAS 0xff99cc
 
 using namespace cv;
 using namespace std;
+
 typedef struct 
 {
     Mat* image;

@@ -31,8 +31,6 @@ bool Clusterizador::createNewCluster(string name, int hexColor){
     return true;
 }
 
-
-
 bool Clusterizador::createNewCluster(string name, int b, int g, int r){
     Cluster auxCluster = Cluster(name, b, g, r);
     std::pair <string, Cluster> par = std::make_pair(name, auxCluster);
