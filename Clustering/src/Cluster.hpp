@@ -43,13 +43,20 @@ class Cluster {
         void setName(string name);
         // void setColor(Color color);
         void setColor(int hexColor);
-        set<int> getElements();
+        // set<int> getElements();
+        bool isInRange(int val);
     private:
         string name;
-        set<int> elements;
+        // set<int> elements;
+        int upperLimit;
+        int lowerLimit;
         // Color color;
         int color;
+        Color minColor;
+        Color maxColor;
         bool newElementVerifier(int val);
         int bgrToInt(int b, int g, int r);
+        Color intToColor(int hexColor);
+        
 };
 

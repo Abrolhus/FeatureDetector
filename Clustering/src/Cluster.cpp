@@ -1,35 +1,41 @@
 #include "Cluster.hpp"
 #include <string>
 void Cluster::printElements(){
-    for (auto it = this->elements.begin(); it != this->elements.end(); ++it)
-    {
-        cout << *it << " ";
-    }
-    cout << endl;
+    cout << "from " << endl;
 }
-
 string Cluster::getColorString(){
     return "(" + to_string(this->b()) + ", " + to_string(this->g()) + ", " + to_string(this->r()) + ")";
 }
 
 int  Cluster::addElement(int val){
-    if(this->newElementVerifier(val)){
-        return this->elements.insert(val).second;
-    }
-    return false;
+    
+    if(!this->newElementVerifier(val))
+        return false;
+    if(isInRange(val))
+        return 2;
+    Color color = intToColor(val);
+    this->maxColor.b = (maxColor.b < color.b)? color.b : maxColor.b;
+    this->maxColor.g = (maxColor.g < color.g)? color.g : maxColor.g;
+    this->maxColor.r = (maxColor.r < color.r)? color.r : maxColor.r;
+    this->minColor.b = (minColor.b > color.b)? color.b : minColor.b;
+    this->minColor.g = (minColor.g > color.g)? color.g : minColor.g;
+    this->minColor.r = (minColor.r > color.r)? color.r : minColor.r;
+    return true;;
 }
 
 bool Cluster::findElement(int val){
-    return this->elements.find(val) != this->elements.end();
-}
-set<int> Cluster::getElements(){// cheap way to interate through this' elements
-    return this->elements;
+    return this->isInRange(val);
 }
 
 Cluster::Cluster(string name, int hexColor) : name(name), color(hexColor){
+           this->maxColor = Color(0,0,0);
+           this->minColor = Color(255,255,255);
 }
+
 Cluster::Cluster(string name, int b, int g, int r) : name(name){
            this->color = this->bgrToInt(b,g,r);
+           this->maxColor = Color(0,0,0);
+           this->minColor = Color(255,255,255);
 }
 
 string Cluster::getName(){
@@ -47,9 +53,7 @@ int Cluster::g(){
 int Cluster::r(){
     return ((this->color) & 0xFF);
 }
-int Cluster::getSize(){
-    return this->elements.size();
-}
+
 void Cluster::setName(string name){
     this->name = name;
 }
@@ -61,4 +65,21 @@ bool Cluster::newElementVerifier(int val){
 }
 int Cluster::bgrToInt(int b, int g, int r){
     return  (b << 16) | (g << 8) | (r);
+}
+bool Cluster::isInRange(int val){
+    Color color = intToColor(val);
+    if(color.b < this->minColor.b || color.b > this->maxColor.b)
+        return false;
+    if(color.g < this->minColor.g || color.g > this->maxColor.g)
+        return false;
+    if(color.r < this->minColor.r || color.r > this->maxColor.r)
+        return false;
+    return true;
+}
+Color Cluster::intToColor(int hexColor){
+    Color color;
+    color.b = ((hexColor >> 16) & 0xFF);
+    color.g = ((hexColor >> 8) & 0xFF);
+    color.r = ((hexColor) & 0xFF);
+    return color;
 }
