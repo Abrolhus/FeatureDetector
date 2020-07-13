@@ -8,6 +8,7 @@
 #include <sstream>
 #include <vector>
 #include <set>
+#include <deque> 
 // using namespace cv;
 // using namespace std; 
 /*note: avoid using "using namespace std in include files, it may break the code 
@@ -46,12 +47,16 @@ class Clusterizador {
         vector<string> getClusterNames();
         void setLoDiff(int val);
         void setUpDiff(int val);
+        int undoLastChange();
+        int redoLastChange();
     private:
-        map<std::string, Cluster> clusters;
+        std::map<std::string, Cluster> clusters;
+        std::deque<std::map<std::string, Cluster>> history;
         int loDiff, upDiff;
         int vec3bToInt(cv::Vec3b vec);
         bool checkIfClusterExists(string cluster);
         int convertHexToInt(string color);
+        int addToHistory();
 
 
 }; 

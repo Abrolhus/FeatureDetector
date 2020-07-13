@@ -39,11 +39,12 @@ bool Clusterizador::createNewCluster(string name, int b, int g, int r){
 }
 
 void Clusterizador::printClusters(){
-    return;
     for(auto it = this->clusters.begin(); it != this->clusters.end(); ++it){
         // cout << it->first << ": " << it->second.getColor() << " color, " << it->second.getSize() << " elements." << endl;
-        cout << it->first << ": " << it->second.getColorString() << " color, " << it->second.getSize() << " elements." << endl;
+        // cout << it->first << ": " << it->second.getColorString() << " color, " << it->second.getSize() << " elements." << endl;
+        it->second.printElements();
     }
+    return;
 }
 
 int Clusterizador::addToClusterByImage(cv::Mat image, string cluster, int x, int y){
@@ -76,6 +77,7 @@ int Clusterizador::addToClusterByImage(cv::Mat image, string cluster, int x, int
             this->clusters.at(cluster).addElement(aux);
         }     
     }
+    this->history.push_back(this->clusters); //add this change to the history;
     return 0;
 }
 int Clusterizador::vec3bToInt(cv::Vec3b vec){
@@ -131,7 +133,7 @@ int Clusterizador::addToClusterViaFile(string file, string cluster){
     ifstream inFile(file.c_str(), ios::in);
     if (inFile)
     {
-        while (getline(inFile, line))
+       while (getline(inFile, line))
         {
             //cout << line << '\n';
             istringstream actualColor(line);
@@ -141,6 +143,7 @@ int Clusterizador::addToClusterViaFile(string file, string cluster){
             actualColor.str("");
         }
         inFile.close();
+        this->history.push_back(this->clusters);
         return 0;
     }
     else
@@ -148,41 +151,41 @@ int Clusterizador::addToClusterViaFile(string file, string cluster){
     return -1;
 } 
 int Clusterizador::saveClusterToFile(string file, string cluster){ 
-    // if(!this->checkIfClusterExists(cluster))
-        // return -1;
-    // cout<< "Loading file..." << endl;
-    // string line;
-    // ifstream inFile(file.c_str(), ios::in);
-    // int c;
-    // std::set<int> fileValues;
-    // std::set<int> clusterValues = this->clusters.at(cluster).getElements();
-    // if (inFile)
-    // {
-        // while (getline(inFile, line))
-        // {
-            // istringstream actualColor(line);
-            // actualColor >> c;
-            // fileValues.insert(c);
-            // actualColor.str("");
-            // // if(this->clusters.at(cluster).findElement(c)){
-        // }
-        // inFile.close();
-    // } else {
-        // cout << "could not open file, creating a new one..." << endl;
-    // }
-    // ofstream outFile(file.c_str(), ios::out);
-    // stringstream ss;
-    // if(outFile){
-        // for(auto it = clusterValues.begin(); it != clusterValues.end(); ++it){
-            // if(fileValues.find(*it) == fileValues.end()){
-                // ss << *it << endl;
-            // }
-        // }
-        // outFile << ss.str();
-        // outFile.close();
-    // } else {
-        // cout << "cant open" << endl;
-    // }
+    if(!this->checkIfClusterExists(cluster))
+        return -1;
+    cout<< "Loading file..." << endl;
+    string line;
+    ifstream inFile(file.c_str(), ios::in);
+    int c;
+    std::set<int> fileValues;
+    std::set<int> clusterValues = this->clusters.at(cluster).getElements();
+    if (inFile)
+    {
+        while (getline(inFile, line))
+        {
+            istringstream actualColor(line);
+            actualColor >> c;
+            fileValues.insert(c);
+            actualColor.str("");
+            // if(this->clusters.at(cluster).findElement(c)){
+        }
+        inFile.close();
+    } else {
+        cout << "could not open file, creating a new one..." << endl;
+    }
+    ofstream outFile(file.c_str(), ios::out);
+    stringstream ss;
+    if(outFile){
+        for(auto it = clusterValues.begin(); it != clusterValues.end(); ++it){
+            if(fileValues.find(*it) == fileValues.end()){
+                ss << *it << endl;
+            }
+        }
+        outFile << ss.str();
+        outFile.close();
+    } else {
+        cout << "cant open" << endl;
+    }
     return 0;
 }
 int Clusterizador::saveAllClustersToFile(string filePrefix){
@@ -222,4 +225,13 @@ int Clusterizador::convertHexToInt(string color){
     // cout << x << endl;
     // return convertHexToColor(x);
 // 
+}
+int Clusterizador::addToHistory(){
+    this->history.push_back(clusters);
+    return 0;
+}
+int Clusterizador::undoLastChange(){
+    this->history.pop_back();
+    this->clusters = this->history.back(); //TODO: use "history.back()" instead of "this->clusters".. I mean, use the history to store all the data, instead of always needing to copy the HEAD of it to the clusters variable.
+    return 0;
 }

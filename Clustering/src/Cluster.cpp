@@ -1,12 +1,20 @@
 #include "Cluster.hpp"
 #include <string>
 void Cluster::printElements(){
-    cout << "from " << endl;
+    std::cout << "from " << this->minColor.b << ", " << this->minColor.g << ", " << this->minColor.r << " to " << this->maxColor.b << ", " << this->maxColor.g << ", " << this->maxColor.r<< std::endl;
 }
 string Cluster::getColorString(){
     return "(" + to_string(this->b()) + ", " + to_string(this->g()) + ", " + to_string(this->r()) + ")";
 }
-
+std::set<int> Cluster::getElements(){
+    // Isso deve demorar bastante O = N^3*logN;
+    std::set<int> st;
+    for(int i = this->minColor.b; i <= this->maxColor.b; i++)
+        for(int j = this->minColor.g; j <= this->maxColor.g; j++)
+            for(int k = this->minColor.r; k <= this->maxColor.r; k++)
+                st.insert(this->bgrToInt(i,j,k));
+    return st;
+}
 int  Cluster::addElement(int val){
     
     if(!this->newElementVerifier(val))

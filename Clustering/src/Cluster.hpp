@@ -40,6 +40,7 @@ class Cluster {
         string getName();
         int getColor();
         int getSize();
+        set<int> getElements();
         void setName(string name);
         // void setColor(Color color);
         void setColor(int hexColor);

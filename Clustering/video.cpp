@@ -161,6 +161,7 @@ int mainLoop (bool* playVideo, VideoCapture* videoCap, Mat* p_image, string wind
             break;
         case 'u':
             cout << "undo command not implemented yet";
+            clust->undoLastChange();
             // removeSetFromSet(st, undoSet);
             break;
         case '1' ... '9':
