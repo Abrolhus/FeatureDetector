@@ -24,6 +24,11 @@ dis_ang_translation.h
 dis_ang_translation.cpp
 clustering.h
 clustering.cpp
-main.cpp)
+main.cpp
+../Clustering/src/Cluster.hpp
+../Clustering/src/Cluster.cpp
+../Clustering/src/Clusterizador.hpp
+../Clustering/src/Clusterizador.cpp
+) #gambiarra
 
 target_link_libraries(main ${OpenCV_LIBS})

@@ -33,7 +33,8 @@ class Clusterizador {
         Clusterizador(int lo=40, int up=40);
         bool createNewCluster(std::string name, string hexColor);
         bool createNewCluster(std::string name, int hexColor);
-        bool createNewCluster(std::string name, int b, int g, int r);
+        bool createNewCluster(std::string name, int hexColor, int minRange, int maxRange);
+        // bool createNewCluster(std::string name, int b, int g, int r);
         void printClusters();
         int addToClusterByImage(cv::Mat image, std::string cluster, int x, int y);
         int addToClusterViaFile(std::string file, std::string cluster);

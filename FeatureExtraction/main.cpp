@@ -19,6 +19,10 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include "clustering.h"
+#include "../Clustering/src/Clusterizador.hpp"
+
+#define BLUE 0xff0000
+#define GREEN 0x00ff00
 
 using namespace cv;
 using namespace std;
@@ -30,7 +34,14 @@ int main(int argc, char **argv)
 	img_rgb = imread(argv[1], CV_LOAD_IMAGE_COLOR);
 	vector<field_point> result_intersections;
 	vector<goalposts> goalPosts;
-	clustering(img_rgb);
+
+    Clusterizador* clus = new Clusterizador();
+    clus->createNewCluster("campo", GREEN);
+    clus->addToClusterViaFile("../clustering.txt", "campo");
+    clus->clusterizarImagem(&img_rgb, "campo");
+	// clustering(img_rgb);
+    imshow("Clusterized", img_rgb);
+    
 	extract_features(img_rgb, result_intersections, goalPosts);
 	for (int i = 0; i < goalPosts.size(); i++)
 	{

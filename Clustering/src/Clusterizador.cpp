@@ -30,9 +30,19 @@ bool Clusterizador::createNewCluster(string name, int hexColor){
     this->clusters.insert(par);
     return true;
 }
-
-bool Clusterizador::createNewCluster(string name, int b, int g, int r){
-    Cluster auxCluster = Cluster(name, b, g, r);
+// 
+// bool Clusterizador::createNewCluster(string name, int b, int g, int r){
+    // if(this->checkIfClusterExists(name))
+        // return false;
+    // Cluster auxCluster = Cluster(name, b, g, r);
+    // std::pair <string, Cluster> par = std::make_pair(name, auxCluster);
+    // this->clusters.insert(par);
+    // return true;
+// }
+bool Clusterizador::createNewCluster(string name, int hexColor, int minRange, int maxRange){
+    if(this->checkIfClusterExists(name))
+        return false;
+    Cluster auxCluster = Cluster(name, hexColor);
     std::pair <string, Cluster> par = std::make_pair(name, auxCluster);
     this->clusters.insert(par);
     return true;
