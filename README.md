@@ -14,6 +14,10 @@ Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
 > - [ ] Add trackbars to up and lodiff
 > - [x] Receive cluster names (and quantity) by argument
 > - [ ] Add flag (something like '-c') to "pre-clusterize" the video acording to the values already present in the text files.
+> - [ ] Use Look Up Table istead of std::set (Just like the original version).
+> - [ ] `./thisProgram video.avi green.txt white.txt` should just like `./thisProgram video.avi green white` would
+
+
 > 
 ### Possible improvements:
-  * Use ranges instead of raw int values. <br />The ideia is to istead of a listing int values like {43, 45, 47, 48, 53, 56, 104, 105, 107, 112, 115, 116, ...}, <br />use something like {43:56, 104:116}
+  * ~~Use ranges instead of raw int values. <br />The ideia is to istead of a listing int values like {43, 45, 47, 48, 53, 56, 104, 105, 107, 112, 115, 116, ...}, <br />use something like {43:56, 104:116}~~
