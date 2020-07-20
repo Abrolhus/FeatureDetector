@@ -15,7 +15,7 @@ Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
 > - [x] Receive cluster names (and quantity) by argument
 > - [ ] Add flag (something like '-c') to "pre-clusterize" the video acording to the values already present in the text files.
 > - [ ] Use Look Up Table istead of std::set (Just like the original version).
-> - [ ] `./thisProgram video.avi green.txt white.txt` should just like `./thisProgram video.avi green white` would
+> - [ ] `./thisProgram video.avi green.txt white.txt` should work just like `./thisProgram video.avi green white` would
 
 
 > 
