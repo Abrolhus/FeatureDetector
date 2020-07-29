@@ -8,6 +8,7 @@
 #include <sstream>
 #include <vector>
 #include <set>
+#include <map>
 // using namespace cv;
 // using namespace std; 
 /*note: avoid using "using namespace std in include files, it may break the code 
