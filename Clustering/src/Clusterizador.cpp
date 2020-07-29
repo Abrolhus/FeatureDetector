@@ -78,48 +78,79 @@ int Clusterizador::addToClusterByImage(cv::Mat image, string cluster, int x, int
     return 0;
 }
 int Clusterizador::vec3bToInt(cv::Vec3b vec){
-    return ((int)vec.val[0] << 16) | ((int)vec.val[1] << 8) | ((int)vec.val[2]); 
+    return ( ((int)vec.val[0]) << 16 ) 
+        | ( ((int)vec.val[1]) << 8 ) 
+        | ( (int)vec.val[2] ); 
 }
-
-int Clusterizador::clusterizarImagem(cv::Mat* img, string cluster){
-    /* Interates through image point by point.
-     * If point's color is in the specified cluster,
-     * changes the color of the point to the cluster's color. #TODO
-     */
-    if(!this->checkIfClusterExists(cluster))
-        return false;
-    MatIterator_<Vec3b> it, end;
-    for( it = img->begin<Vec3b>(), end = img->end<Vec3b>(); it != end; ++it)
-    { // https://docs.opencv.org/2.4/doc/tutorials/core/how_to_scan_images/how_to_scan_images.html#the-iterator-safe-method
-        if(this->clusters.at(cluster).findElement(this->vec3bToInt(*it))){
-            (*it)[0] = this->clusters.at(cluster).b();
-            (*it)[1] = this->clusters.at(cluster).g();
-            (*it)[2] = this->clusters.at(cluster).r();
-        }
-    }
-    return 0;
-}
-
+// 
+// int Clusterizador::clusterizarImagem(cv::Mat* img, string cluster){
+    // /* Interates through image point by point.
+     // * If point's color is in the specified cluster,
+     // * changes the color of the point to the cluster's color. #TODO
+     // */
+    // if(!this->checkIfClusterExists(cluster))
+        // return false;
+    // // MatIterator_<Vec3b> it, end;
+    // // for( it = img->begin<Vec3b>(), end = img->end<Vec3b>(); it != end; ++it)
+     // // https://docs.opencv.org/2.4/doc/tutorials/core/how_to_scan_images/how_to_scan_images.html#the-iterator-safe-method
+// 
+    // for(size_t x = 0; x < img->cols; x++){
+        // for(size_t y = 0; y < img->rows; y++)
+        // {
+            // cout << "teste ";
+            // Vec3b color = img->at<Vec3b>(y, x);
+            // for(auto clust = this->clusters.begin(); clust != this->clusters.end(); ++clust)
+            // { 
+                // if(clust->second.findElement(this->vec3bToInt(color))){
+                    // (color)[0] = clust->second.b();
+                    // (color)[1] = clust->second.g();
+                    // (color)[2] = clust->second.r();
+                    // img->at<Vec3b>(y, x) = color;
+                // }
+// 
+            // }
+        // }
+    // }
+    // return 0;
+// }
+// 
 int Clusterizador::clusterizarImagem(cv::Mat* img){
     /* Para cada elemento da imagem, procura por este em cada um dos "clusters".
      * Se encontrar substitui o valor de cor deste pelo valor do cluster em questão
      */
-    MatIterator_<Vec3b> it, end;
+    // MatIterator_<Vec3b> it, end;
     //TODO: find a better way to interate through image and clusterize it. 
     //Right now it n^2 * log(n).
-    for( it = img->begin<Vec3b>(), end = img->end<Vec3b>(); it != end; ++it) 
+    // for( it = img->begin<Vec3b>(), end = img->end<Vec3b>(); it != end; ++it) 
         //TODO: check if this interator method is faster than the old for(i){for(j)} way
         // https://docs.opencv.org/2.4/doc/tutorials/core/how_to_scan_images/how_to_scan_images.html
-    {
-        for(auto clust = this->clusters.begin(); clust != this->clusters.end(); ++clust)
-        { // https://docs.opencv.org/2.4/doc/tutorials/core/how_to_scan_images/how_to_scan_images.html#the-iterator-safe-method
-            if(clust->second.findElement(this->vec3bToInt(*it))){
-                (*it)[0] = clust->second.b();
-                (*it)[1] = clust->second.g();
-                (*it)[2] = clust->second.r();
+        //// https://docs.opencv.org/2.4/doc/tutorials/core/how_to_scan_images/how_to_scan_images.html#the-iterator-safe-method
+    int B, G, R, col;
+    for(size_t x = 0; x < img->cols; x++){
+        for(size_t y = 0; y < img->rows; y++)
+        {
+            Vec3b color = img->at<Vec3b>(y, x);
+            B = (int)color.val[0];
+            G = (int)color.val[1];
+            R = (int)color.val[2];
+            col = (B << 16) | (G << 8) | R;
+
+
+            for(auto clust = this->clusters.begin(); clust != this->clusters.end(); ++clust)
+            { 
+                // if(clust->second.findElement(this->vec3bToInt(color))){
+                if(clust->second.findElement(col)){
+                    cout << this->vec3bToInt(color) << " ";
+                    cout << "(" << (int)color[0] << ", " << (int)color[1] << ", " << (int)color[2] << ")" << endl;
+                    (color)[0] = clust->second.b();
+                    (color)[1] = clust->second.g();
+                    (color)[2] = clust->second.r();
+                    img->at<Vec3b>(y, x) = color;
+                }
             }
         }
     }
+    cout << " ________" << endl;
     return 0;
 }
 
@@ -140,6 +171,7 @@ int Clusterizador::addToClusterViaFile(string file, string cluster){
             actualColor.str("");
         }
         inFile.close();
+        this->clusters.at(cluster).printElements();
         return 0;
     }
     else

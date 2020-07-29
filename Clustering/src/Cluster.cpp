@@ -1,6 +1,8 @@
 #include "Cluster.hpp"
 #include <string>
 void Cluster::printElements(){
+    /* Prints all int values stored
+     */
     for (auto it = this->elements.begin(); it != this->elements.end(); ++it)
     {
         cout << *it << " ";
@@ -9,6 +11,8 @@ void Cluster::printElements(){
 }
 
 string Cluster::getColorString(){
+    /* returns a BGR 
+     */
     return "(" + to_string(this->b()) + ", " + to_string(this->g()) + ", " + to_string(this->r()) + ")";
 }
 
@@ -32,6 +36,7 @@ Cluster::Cluster(string name, int b, int g, int r) : name(name){
            this->color = this->bgrToInt(b,g,r);
 }
 
+/// GETS ///
 string Cluster::getName(){
     return this->name;
 }
@@ -50,14 +55,23 @@ int Cluster::r(){
 int Cluster::getSize(){
     return this->elements.size();
 }
+
+/// SETS ///
 void Cluster::setName(string name){
     this->name = name;
 }
 void Cluster::setColor(int hexColor){
-    this->color = hexColor;
+    if(newElementVerifier(hexColor))
+        this->color = hexColor;
 }
+/// PRIVATE ///
 bool Cluster::newElementVerifier(int val){
-    return true;
+    /* checks if its a valid color value,
+     * from 0 to ffffff
+     */
+    if(0 <= val && val <= 0xFFFFFF) 
+        return true;
+    return false;
 }
 int Cluster::bgrToInt(int b, int g, int r){
     return  (b << 16) | (g << 8) | (r);

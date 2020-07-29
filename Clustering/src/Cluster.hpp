@@ -9,23 +9,23 @@
 #include <set>
 using namespace std;
 using namespace cv;
-
-struct Color{
-    int b;
-    int g;
-    int r;
-    Color(int pb, int pg, int pr) : b(pb), g(pg), r(pr){
-    }
-    Color(){
-
-        b = 0;
-        g = 0;
-        r = 0;
-    }
-};
+// 
+// struct Color{
+    // int b;
+    // int g;
+    // int r;
+    // Color(int pb, int pg, int pr) : b(pb), g(pg), r(pr){
+    // }
+    // Color(){
+// 
+        // b = 0;
+        // g = 0;
+        // r = 0;
+    // }
+// };
 class Cluster {
     public:
-        Cluster(string name, Color color);
+        // Cluster(string name, Color color);
         int b();
         int g();
         int r();
@@ -41,8 +41,8 @@ class Cluster {
         int getColor();
         int getSize();
         void setName(string name);
-        // void setColor(Color color);
         void setColor(int hexColor);
+        // void setColor(Color color);
         set<int> getElements();
     private:
         string name;
