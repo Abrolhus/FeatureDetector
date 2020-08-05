@@ -66,4 +66,3 @@ void clustering(Mat img)
     }
     imshow("Clusterized", img);
 }
-

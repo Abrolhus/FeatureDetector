@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <opencv2/highgui/highgui.hpp>
 #include <sstream>
 #include <vector>
 #include <set>
@@ -72,7 +73,7 @@ int main(int argc, char **argv)
     } 
      
     bool playVideo = true;
-    VideoCapture* VideoCap = new VideoCapture(video);
+    VideoCapture* VideoCap = new cv::VideoCapture(video);
     string currentCluster = "";
     ClusteringParams clusParams = {&image, Clst, &currentCluster};
     vector<ClusterConfigs> clusterVector; // vector contendo nome e cor dos clusters a serem
@@ -116,13 +117,23 @@ void onMouse(int event, int x, int y, int, void* params)
 int mainLoop (bool* playVideo, VideoCapture* videoCap, Mat* p_image, string window, Clusterizador* clust, string* currentCluster)
 {
     Mat frame;
+    Mat convertedFrame;
     string* p_currentCluster = currentCluster;
     if(*playVideo)   
         *videoCap >> frame; // get a new frame from camera
     if(frame.empty() && p_image->empty()) 
         return 0; 
-    else if(!frame.empty())
-        frame.copyTo(*p_image);
+    else if(!frame.empty()){
+        cout << "frame type: " << frame.type() << endl;
+        cout << "image type: " <<p_image->type() << endl;
+        frame.convertTo(convertedFrame, p_image->type());
+        cout << "convertedFrame type: " << convertedFrame.type() << endl;
+        cout << "video capture retrive type:" << videoCap->get(CV_CAP_PROP_FORMAT) << endl;
+        if (convertedFrame.type() == p_image->type()){
+            cout << "igual ";
+        }
+        convertedFrame.copyTo(*p_image);
+    }
 
     // clust->clusterizarImagem(p_image, "jerseys");
     // clust->clusterizarImagem(p_image, "campo");
@@ -130,7 +141,7 @@ int mainLoop (bool* playVideo, VideoCapture* videoCap, Mat* p_image, string wind
     imshow(window, *p_image);
     // if(waitKey(30) >= 0) break;
     char c = 0;
-    c = (char)waitKey(10);
+    c = (char)waitKey(10000);
 
     // char c = (char)waitKey(15);
     if (c == 27 || c == 'q')
@@ -154,6 +165,8 @@ int mainLoop (bool* playVideo, VideoCapture* videoCap, Mat* p_image, string wind
         case 'w':
             cout << "Saving all Clusters to file..." << endl; 
             clust->saveAllClustersToFile();
+            cv::imwrite("img.png", *p_image);
+            cout << "saved" << endl;
             break;
         case 'n':
             cout << "printing clusters..." << endl;

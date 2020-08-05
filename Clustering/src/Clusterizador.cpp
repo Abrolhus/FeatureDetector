@@ -67,6 +67,7 @@ int Clusterizador::addToClusterByImage(cv::Mat image, string cluster, int x, int
     int flags = CONNECTIVITY + (NEWMASKVAL << 8) + CV_FLOODFILL_FIXED_RANGE + CV_FLOODFILL_MASK_ONLY;
     int area = cv::floodFill(image, mask, seed, Scalar(255,0,0),  &ccomp, Scalar(this->loDiff, this->loDiff, this->loDiff), 
             Scalar(this->upDiff, this->upDiff, this->upDiff),flags);
+    imshow("mask", mask);
     for(auto it = mask.begin<uchar>(); it != mask.end<uchar>(); ++it){
         if(*it == 255){
                 // aux = this->vec3bToInt(Vec3b() );
@@ -140,8 +141,8 @@ int Clusterizador::clusterizarImagem(cv::Mat* img){
             { 
                 // if(clust->second.findElement(this->vec3bToInt(color))){
                 if(clust->second.findElement(col)){
-                    cout << this->vec3bToInt(color) << " ";
-                    cout << "(" << (int)color[0] << ", " << (int)color[1] << ", " << (int)color[2] << ")" << endl;
+                    // cout << this->vec3bToInt(color) << " ";
+                    // cout << "(" << (int)color[0] << ", " << (int)color[1] << ", " << (int)color[2] << ")" << endl;
                     (color)[0] = clust->second.b();
                     (color)[1] = clust->second.g();
                     (color)[2] = clust->second.r();
@@ -150,7 +151,7 @@ int Clusterizador::clusterizarImagem(cv::Mat* img){
             }
         }
     }
-    cout << " ________" << endl;
+    imshow("teste",*img);
     return 0;
 }
 
